@@ -3,32 +3,71 @@ from collections import defaultdict
 
 from src.common import read_jobshop_instance
 
+
 def read_solution_order(path):
-    """Lê a ordem de solução de um arquivo."""
+    """
+    Reads a job shop scheduling solution from a file and returns it as a list of operation tuples.
+
+    Each line should contain five integers: job_id, operation_index, machine_id, start_time, and duration.
+
+    Args:
+        path (str): The path to the solution file.
+
+    Returns:
+        list[tuple[int, int, int, int, int]]: List of tuples representing operations.
+    """
     order = []
-    with open(path, 'r') as f:
+    with open(path, "r") as f:
         for line in f:
             line = line.strip()
             if line:
                 parts = line.split()
                 if len(parts) != 5:
-                    print(f"❌ Linha inválida: {line}. Esperava 5 valores.")
+                    print(f"❌ Invalid line: {line}. Expected 5 values.")
                     continue
                 order.append(tuple(map(int, parts)))
     return order
 
+
 def check_duplicates(order):
-    """Verifica se há operações duplicadas na solução."""
+    """
+    Checks if a given schedule has any duplicate operations.
+
+    Args:
+        order (list[tuple[int, int, int, int, int]]): The schedule to check.
+
+    Returns:
+        bool: True if no duplicates are found, False otherwise.
+    """
     seen = set()
     for operation in order:
         if operation in seen:
-            print(f"❌ Operação repetida: {operation}")
+            print(f"❌ Duplicate operation: {operation}")
             return False
         seen.add(operation)
     return True
 
+
 def check_all_operations_scheduled(jobs, order):
-    """Verifica se todas as operações dos jobs estão agendadas corretamente."""
+    """
+    Checks if all required operations are scheduled and no extra operations are present.
+
+    This function compares the required operations for each job against the operations
+    provided in the order. It identifies any missing or extra operations and returns
+    False if any discrepancies are found.
+
+    Args:
+        jobs (list[list[tuple[int, int]]]): A list of jobs, where each job is a list
+            of operations represented as (machine, duration) tuples.
+        order (list[tuple[int, int, int, int, int]]): A list of scheduled operations,
+            with each operation represented as a tuple:
+            (job_id, operation_index, machine_id, start_time, duration).
+
+    Returns:
+        bool: True if all required operations are scheduled and no extra operations
+        are present; False otherwise. Prints details of missing or extra operations if any.
+    """
+
     required_ops = set((j, o) for j in range(len(jobs)) for o in range(len(jobs[j])))
     given_ops = set((job, op) for job, op, _, _, _ in order)
 
@@ -36,15 +75,33 @@ def check_all_operations_scheduled(jobs, order):
     extra = given_ops - required_ops
 
     if missing:
-        print(f"❌ Operações faltando: {missing}")
+        print(f"❌ Missing operations: {missing}")
         return False
     if extra:
-        print(f"❌ Operações extras: {extra}")
+        print(f"❌ Extra operations: {extra}")
         return False
     return True
 
+
 def build_schedule(order):
-    """Constrói o cronograma baseado na ordem de solução."""
+    """
+    Constructs a schedule from a list of ordered operations.
+
+    This function validates the order of operations for each job and ensures that no operations are out of sequence.
+    It calculates the ready times for each job and machine, updating them as operations are scheduled.
+    The function returns a list representing the complete schedule.
+
+    Args:
+        order (list[tuple[int, int, int, int, int]]): A list of operations, where each operation is represented as a
+            tuple: (job_id, operation_index, machine_id, start_time, duration).
+
+    Returns:
+        list[tuple[int, int, int, int, int]]: A list of scheduled operations, each represented as a tuple:
+            (job_id, operation_index, machine_id, start_time, duration).
+
+    Raises:
+        ValueError: If an operation is found out of order for any job.
+    """
     job_next_op = defaultdict(int)
     job_ready_time = defaultdict(int)
     machine_ready_time = defaultdict(int)
@@ -52,7 +109,9 @@ def build_schedule(order):
 
     for job, op, machine, start_time, duration in order:
         if op != job_next_op[job]:
-            raise ValueError(f"Operação fora de ordem no job {job}: esperava op {job_next_op[job]}, recebeu {op}")
+            raise ValueError(
+                f"Operation out of order for job {job}: expected op {job_next_op[job]}, received {op}"
+            )
 
         job_ready_time[job] = max(job_ready_time[job], start_time)
         machine_ready_time[machine] = max(machine_ready_time[machine], start_time)
@@ -65,8 +124,20 @@ def build_schedule(order):
 
     return schedule
 
+
 def check_conflicts(schedule):
-    """Verifica se há conflitos de máquina no cronograma."""
+    """
+    Checks if the given schedule has any conflicts between operations on the same machine.
+
+    Args:
+        schedule (list[tuple[int, int, int, int, int]]): A list of scheduled operations, each represented as a tuple:
+            (job_id, operation_index, machine_id, start_time, duration).
+
+    Returns:
+        bool: True if the schedule has no conflicts, False otherwise.
+
+    Prints a message for each conflict found, indicating the conflicting operations and the conflicting times.
+    """
     machine_ops = defaultdict(list)
     for job, op, machine, start, duration in schedule:
         machine_ops[machine].append((start, start + duration, job, op))
@@ -77,39 +148,51 @@ def check_conflicts(schedule):
             end_prev = ops[i - 1][1]
             start_curr = ops[i][0]
             if start_curr < end_prev:
-                print(f"❌ Conflito na máquina {machine}: operação ({ops[i][2]},{ops[i][3]}) começa em {start_curr}, antes do fim de ({ops[i - 1][2]},{ops[i - 1][3]}) em {end_prev}.")
+                print(
+                    f"❌ Conflict on machine {machine}: operation ({ops[i][2]},{ops[i][3]}) starts at {start_curr}, before the end of ({ops[i - 1][2]},{ops[i - 1][3]}) at {end_prev}."
+                )
                 return False
     return True
 
+
 def main(instance_file, solution_file):
-    """Função principal para validar a solução de jobshop."""
+    """
+    Validates a given job shop scheduling solution against the given instance.
+
+    Prints a success message if the solution is valid, or an error message if it is not.
+
+    Args:
+        instance_file (str): The file path of the JSSP instance
+        solution_file (str): The file path of the solution to validate
+    """
     try:
         jobs, _, _ = read_jobshop_instance(instance_file)
         order = read_solution_order(solution_file)
-        
+
         if not check_duplicates(order):
-            print("❌ Solução inválida (operações repetidas).")
+            print("❌ Invalid solution (duplicate operations).")
             return
 
         if not check_all_operations_scheduled(jobs, order):
-            print("❌ Solução inválida (operações faltando ou extras).")
+            print("❌ Invalid solution (missing or extra operations).")
             return
 
         schedule = build_schedule(order)
 
         if check_conflicts(schedule):
-            print("✅ Solução válida (sem conflitos de máquina).")
+            print("✅ Valid solution (no machine conflicts).")
         else:
-            print("❌ Solução inválida (conflitos detectados).")
+            print("❌ Invalid solution (conflicts detected).")
 
         makespan = max(start + duration for _, _, _, start, duration in schedule)
         print(f"⏱️ Makespan: {makespan}")
 
     except Exception as e:
-        print(f"Erro ao validar: {e}")
+        print(f"Error validating: {e}")
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print("Uso: python checker.py instancia.txt solucao.txt")
+        print("Usage: python checker.py instance.txt solution.txt")
     else:
         main(sys.argv[1], sys.argv[2])
