@@ -178,7 +178,7 @@ def main(instance_file, solution_file):
             raise ValueError("❌ Invalid solution: missing or extra operations.")
 
         schedule = build_schedule(order)
-
+        
         if not check_conflicts(schedule):
             raise ValueError("❌ Invalid solution: machine conflicts detected.")
 
@@ -187,7 +187,7 @@ def main(instance_file, solution_file):
         print(f"⏱️ Makespan: {makespan}")
 
     except Exception as e:
-        print(f"❌ Error validating: {e}")
+        print(f"{e}")
 
 
 if __name__ == "__main__":
