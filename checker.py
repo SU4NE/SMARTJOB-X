@@ -18,14 +18,16 @@ def read_solution_order(path):
     """
     order = []
     with open(path, "r") as f:
-        for line in f:
+        for line_num, line in enumerate(f, start=1):
             line = line.strip()
             if line:
                 parts = line.split()
                 if len(parts) != 5:
-                    print(f"❌ Invalid line: {line}. Expected 5 values.")
-                    continue
-                order.append(tuple(map(int, parts)))
+                    raise ValueError(f"❌ Invalid line at {line_num}: {line}. Expected 5 values.")
+                try:
+                    order.append(tuple(map(int, parts)))
+                except ValueError:
+                    raise ValueError(f"❌ Line {line_num} contains non-integer values: {line}")
     return order
 
 
@@ -170,25 +172,22 @@ def main(instance_file, solution_file):
         order = read_solution_order(solution_file)
 
         if not check_duplicates(order):
-            print("❌ Invalid solution (duplicate operations).")
-            return
+            raise ValueError("❌ Invalid solution: duplicate operations found.")
 
         if not check_all_operations_scheduled(jobs, order):
-            print("❌ Invalid solution (missing or extra operations).")
-            return
+            raise ValueError("❌ Invalid solution: missing or extra operations.")
 
         schedule = build_schedule(order)
 
-        if check_conflicts(schedule):
-            print("✅ Valid solution (no machine conflicts).")
-        else:
-            print("❌ Invalid solution (conflicts detected).")
+        if not check_conflicts(schedule):
+            raise ValueError("❌ Invalid solution: machine conflicts detected.")
 
+        print("✅ Valid solution (no machine conflicts).")
         makespan = max(start + duration for _, _, _, start, duration in schedule)
         print(f"⏱️ Makespan: {makespan}")
 
     except Exception as e:
-        print(f"Error validating: {e}")
+        print(f"❌ Error validating: {e}")
 
 
 if __name__ == "__main__":
