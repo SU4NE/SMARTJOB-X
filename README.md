@@ -17,6 +17,7 @@ O projeto é dividido em alguns módulos principais:
 4. **`common.py`**: Contém funções auxiliares para ler e escrever as instâncias de entrada e as soluções geradas.
 5. **`write_output.py`**: Função para salvar a solução gerada em um arquivo de saída.
 6. **`read_input.py`**: Função para ler a instância de entrada do arquivo de entrada.
+7. **`optimum.py`**: Mostra a solução otima para o problema se não existir uma solução otima conhecida mostra o lower bound.
 
 ### Fluxo de Execução
 
@@ -90,3 +91,15 @@ Para rodar o projeto, siga os seguintes passos:
    Onde `solucao.txt` é o arquivo de saída gerado pelo solver.
 
    Se não houver conflitos, a validação irá retornar "✅ Solução válida", caso contrário, indicará os problemas encontrados.
+
+## References
+
+   - J. Adams, E. Balas, D. Zawack. "The shifting bottleneck procedure for job shop scheduling.", Management Science, Vol. 34, Issue 3, pp. 391-401, 1988.
+   - J.F. Muth, G.L. Thompson. "Industrial scheduling.", Englewood Cliffs, NJ, Prentice-Hall, 1963.
+   - S. Lawrence. "Resource constrained project scheduling: an experimental investigation of heuristic scheduling techniques (Supplement).", Graduate School of Industrial Administration. Pittsburgh, Pennsylvania, Carnegie-Mellon University, 1984.
+   - D. Applegate, W. Cook. "A computational study of job-shop scheduling.", ORSA Journal on Computer, Vol. 3, Isuue 2, pp. 149-156, 1991.
+   - R.H. Storer, S.D. Wu, R. Vaccari. "New search spaces for sequencing problems with applications to job-shop scheduling.", Management Science Vol. 38, Issue 10, pp. 1495-1509, 1992.
+   - T. Yamada, R. Nakano. "A genetic algorithm applicable to large-scale job-shop problems.", Proceedings of the Second international workshop on parallel problem solving from Nature (PPSN'2). Brussels (Belgium), pp. 281-290, 1992.
+   - E. Taillard. "Benchmarks for basic scheduling problems", European Journal of Operational Research, Vol. 64, Issue 2, pp. 278-285, 1993.
+   - tamy0612. JSPLIB. https://github.com/tamy0612/JSPLIB.git
+    
