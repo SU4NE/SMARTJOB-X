@@ -50,9 +50,9 @@ Para rodar o projeto, siga os seguintes passos:
    ```
     4 4 # 3 jobs, 3 machines
     4 88 8 68 6 94 # job 0 -> (job 0 | machine:4 duration:88, ...)
-    5 72 3 50 6 69 # job 1 -> (job 0 | machine:5 duration:72, ...)
-    9 83 8 61 0 83 # job 2 -> (job 0 | machine:9 duration:83, ...)
-    7 94 2 68 1 61 # job 3 -> (job 0 | machine:7 duration:94, ...)
+    5 72 3 50 6 69 # job 1 -> (job 1 | machine:5 duration:72, ...)
+    9 83 8 61 0 83 # job 2 -> (job 2 | machine:9 duration:83, ...)
+    7 94 2 68 1 61 # job 3 -> (job 3 | machine:7 duration:94, ...)
    ```
 
 3. **Arquivo de saída**:
